@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from typing import DefaultDict, Dict, List, Union
+from typing import Dict, List, Union, DefaultDict
 import random
 
 
@@ -20,12 +20,15 @@ def generate_batches(features_dir: str,
 
             for filename in batch_filenames:
                 img_input = np.load(os.path.join(features_dir, f'{filename}.npy'))
+                img_input = np.squeeze(img_input, axis=0)
                 text_inputs = captions[filename]['inputs']
-                targets = captions[filename]['targets']
+                targets = captions[filename]['outputs']
                 idx = random.randint(0, len(text_inputs) - 1)
-
                 batch_image_inputs.append(img_input)
                 batch_text_inputs.append(text_inputs[idx])
-                batch_labels.append(targets[idx])
+                batch_labels.append(np.array(targets[idx], dtype=np.int32))
 
-            yield np.array(batch_image_inputs), np.array(batch_text_inputs), np.array(batch_labels)
+            if len(batch_text_inputs) > 0:
+                yield (np.array(batch_image_inputs), np.array(batch_text_inputs)), np.array(batch_labels)
+            else:
+                print("Warning: Empty batch, skipping.")
