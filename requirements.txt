@@ -4,3 +4,4 @@ tensorflow==2.14.0
 tqdm
 pandas==2.2.3
 transformers==4.48.1
+scikit-learn
